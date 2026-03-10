@@ -1,0 +1,27 @@
+clc;
+clear;
+close;
+
+n = -2:1;
+x = [1 -2 3 6];
+
+n2 = -5:-2;
+y2 = [1 -2 3 6];
+
+figure(1)
+
+subplot(2,1,1)
+plot2d3(n,x)
+plot(n,x, 'ro')
+title("Original Signal x(n)")
+xlabel("n")
+ylabel("Amplitude")
+xgrid()
+
+subplot(2,1,2)
+plot2d3(n2,y2)
+plot(n2,y2, 'ro')
+title("y2(n) = x(n+3)")
+xlabel("n")
+ylabel("Amplitude")
+xgrid()

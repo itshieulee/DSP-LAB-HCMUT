@@ -57,11 +57,12 @@ sleep(1000);
 // ================= (e) =================
 n_e = -1:5;
 yn_e = zeros(1, length(n_e));
-yn_e(find(n_e == 3)) = 1;
-clf(); plot2d3(n_e, yn_e, style=4);
-xtitle("e) y(n) = x(n-1)delta(n-3)", "n", "Amplitude"); xgrid();
-sleep(1000);
 
+idx = find(n_e == 3);
+yn_e(idx) = xn(find(nx == 2));  
+plot2d3(n_e, yn_e, style=4);
+xtitle("y(n) = x(n-1)δ(n-3)", "n", "Amplitude");
+xgrid();
 // ================= (f) =================
 nf = -2:2;
 ynf = zeros(1, length(nf));

@@ -20,134 +20,83 @@ function [y, yorigin] = fold(x, xorigin)
     yorigin = length(x) - xorigin + 1;
 endfunction
 
-xn = [1, 1, 1, 1, 1, 0.5, 0.5]; xorg = 3; 
+// ================= ORIGINAL SIGNAL =================
+xn = [1, 1, 1, 1, 1, 0.5, 0.5];
+xorigin = 3;
+nx = (1:length(xn)) - xorigin;
 
-// (a) Delay 2
+// ================= (a) =================
 [yn, yorigin] = delay(xn, xorigin, 2);
 ny = (1:length(yn)) - yorigin;
 clf(); plot2d3(ny, yn, style=2);
 xtitle("a) y(n) = x(n-2)", "n", "Amplitude"); xgrid();
+sleep(1000);
 
-// (b) Fold and Delay 4
+// ================= (b) =================
 [xf, forigin] = fold(xn, xorigin);
 [yn, yorigin] = delay(xf, forigin, 4);
 ny = (1:length(yn)) - yorigin;
 clf(); plot2d3(ny, yn, style=5);
 xtitle("b) y(n) = x(4-n)", "n", "Amplitude"); xgrid();
+sleep(1000);
 
-// (c) Advance by 2
+// ================= (c) =================
 [yn, yorigin] = advance(xn, xorigin, 2);
 ny = (1:length(yn)) - yorigin;
 clf(); plot2d3(ny, yn, style=3);
 xtitle("c) y(n) = x(n+2)", "n", "Amplitude"); xgrid();
+sleep(1000);
 
-// (d) Multiplication with u(2-n)
-un = [1, 1, 1, 1, 0, 0]; // u(2-n) values for n = [-1..4]
+// ================= (d) =================
+un = double(nx <= 2);
 yn = xn .* un;
 clf(); plot2d3(nx, yn, style=2);
 xtitle("d) y(n) = x(n)u(2-n)", "n", "Amplitude"); xgrid();
+sleep(1000);
 
-// (e)
-x(n-1) at n=3 is x(2) = 1. Output is a delta at n=3.
+// ================= (e) =================
 n_e = -1:5;
 yn_e = zeros(1, length(n_e));
-yn_e(find(n_e == 3)) = 1; 
-clf(); plot2d3(n_e, yn_e, style=4);
-xtitle("e) y(n) = x(n-1)delta(n-3)", "n", "Amplitude"); xgrid();
 
-// (f) Nonlinear Scaling x(n^2)clc; clear; clf();
-
-// ================= FUNCTIONS =================
-function [y, yorigin] = delay(x, xorigin, k)
-    if k >= 0 then
-        y = [zeros(1, k), x];
-        yorigin = xorigin + k;
+idx = find(n_e == 3);
+yn_e(idx) = xn(find(nx == 2));  
+plot2d3(n_e, yn_e, style=4);
+xtitle("y(n) = x(n-1)δ(n-3)", "n", "Amplitude");
+xgrid();
+// ================= (f) =================
+nf = -2:2;
+ynf = zeros(1, length(nf));
+for i = 1:length(nf)
+    idx = find(nx == nf(i)^2);
+    if idx <> [] then
+        ynf(i) = xn(idx);
     else
-        y = x((-k+1):$);
-        yorigin = xorigin + k;
+        ynf(i) = 0;
     end
-endfunction
-
-function [y, yorigin] = advance(x, xorigin, k)
-    [y, yorigin] = delay(x, xorigin, -k);
-endfunction
-
-function [y, yorigin] = fold(x, xorigin)
-    y = flipdim(x, 2);
-    yorigin = length(x) - xorigin + 1;
-endfunction
-
-xn = [1, 1, 1, 1, 1, 0.5, 0.5]; xorg = 3; 
-
-// (a) Delay 2
-[yn, yorigin] = delay(xn, xorigin, 2);
-ny = (1:length(yn)) - yorigin;
-clf(); plot2d3(ny, yn, style=2);
-xtitle("a) y(n) = x(n-2)", "n", "Amplitude"); xgrid();
-
-// (b) Fold and Delay 4
-[xf, forigin] = fold(xn, xorigin);
-[yn, yorigin] = delay(xf, forigin, 4);
-ny = (1:length(yn)) - yorigin;
-clf(); plot2d3(ny, yn, style=5);
-xtitle("b) y(n) = x(4-n)", "n", "Amplitude"); xgrid();
-
-// (c) Advance by 2
-[yn, yorigin] = advance(xn, xorigin, 2);
-ny = (1:length(yn)) - yorigin;
-clf(); plot2d3(ny, yn, style=3);
-xtitle("c) y(n) = x(n+2)", "n", "Amplitude"); xgrid();
-
-// (d) Multiplication with u(2-n)
-un = [1, 1, 1, 1, 0, 0]; // u(2-n) values for n = [-1..4]
-yn = xn .* un;
-clf(); plot2d3(nx, yn, style=2);
-xtitle("d) y(n) = x(n)u(2-n)", "n", "Amplitude"); xgrid();
-
-// (e)
-x(n-1) at n=3 is x(2) = 1. Output is a delta at n=3.
-n_e = -1:5;
-yn_e = zeros(1, length(n_e));
-yn_e(find(n_e == 3)) = 1; 
-clf(); plot2d3(n_e, yn_e, style=4);
-xtitle("e) y(n) = x(n-1)delta(n-3)", "n", "Amplitude"); xgrid();
-
-// (f) Nonlinear Scaling x(n^2)
-nf = -2:2; // Since (-3)^2 = 9 (outside range)
-ynf = [xn(find(nx == (-2)^2)), xn(find(nx == (-1)^2)), xn(find(nx == 0^2)), ..
-       xn(find(nx == 1^2)), xn(find(nx == 2^2))];
-// Note: if index not found, value is 0. Manual map: [0.5, 1, 1, 1, 0.5]
-ynf = [0.5, 1, 1, 1, 0.5]; 
+end
 clf(); plot2d3(nf, ynf, style=5);
 xtitle("f) y(n) = x(n^2)", "n", "Amplitude"); xgrid();
+sleep(1000);
 
-// (g, h) Even and Odd Decomposition
-n_all = -4:4; // Range to cover both x(n) and x(-n)
+// ================= (g,h) =================
+n_all = -4:4;
 x_full = zeros(1, length(n_all));
-x_full(find(n_all >= -1 & n_all <= 4)) = xn;
-x_fold = flipdim(x_full, 2);
+for i = 1:length(n_all)
+    idx = find(nx == n_all(i));
+    if idx <> [] then
+        x_full(i) = xn(idx);
+    end
+end
 
+x_fold = flipdim(x_full, 2);
 xe = (x_full + x_fold) / 2;
 xo = (x_full - x_fold) / 2;
 
-subplot(2,1,1); plot2d3(n_all, xe, style=2); xtitle("g) Even part"); xgrid();
-subplot(2,1,2); plot2d3(n_all, xo, style=5); xtitle("h) Odd part"); xgrid();
-nf = -2:2; // Since (-3)^2 = 9 (outside range)
-ynf = [xn(find(nx == (-2)^2)), xn(find(nx == (-1)^2)), xn(find(nx == 0^2)), ..
-       xn(find(nx == 1^2)), xn(find(nx == 2^2))];
-// Note: if index not found, value is 0. Manual map: [0.5, 1, 1, 1, 0.5]
-ynf = [0.5, 1, 1, 1, 0.5]; 
-clf(); plot2d3(nf, ynf, style=5);
-xtitle("f) y(n) = x(n^2)", "n", "Amplitude"); xgrid();
+clf();
+subplot(2,1,1);
+plot2d3(n_all, xe, style=2);
+xtitle("g) Even part", "n", "Amplitude"); xgrid();
 
-// (g, h) Even and Odd Decomposition
-n_all = -4:4; // Range to cover both x(n) and x(-n)
-x_full = zeros(1, length(n_all));
-x_full(find(n_all >= -1 & n_all <= 4)) = xn;
-x_fold = flipdim(x_full, 2);
-
-xe = (x_full + x_fold) / 2;
-xo = (x_full - x_fold) / 2;
-
-subplot(2,1,1); plot2d3(n_all, xe, style=2); xtitle("g) Even part"); xgrid();
-subplot(2,1,2); plot2d3(n_all, xo, style=5); xtitle("h) Odd part"); xgrid();
+subplot(2,1,2);
+plot2d3(n_all, xo, style=5);
+xtitle("h) Odd part", "n", "Amplitude"); xgrid();

@@ -1,0 +1,13 @@
+clf();
+A = 1;
+k = -5:5;
+c_k = (2 * A) ./ (%pi * (1 - 4 * k.^2));
+P_k = abs(c_k).^2;
+f = gcf();
+f.figure_name = "Exercise 4.1 PSD";
+plot2d3(k, P_k, style=2); 
+plot2d(k, P_k, style=-9); 
+xtitle("Power Spectral Density of Full-Wave Rectified Sinusoid", "Harmonic Index (k)", "Power |c_k|^2");
+xgrid(1);
+xstring(0.2, P_k(find(k==0)), "DC Power ~0.405 A^2");
+xstring(1.2, P_k(find(k==1)), "k=1 Power ~0.045 A^2");
